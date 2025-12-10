@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Secure Feedback Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --bg-card: #020617;
+      --border-subtle: #1f2937;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.14);
+      --accent-strong: #0ea5e9;
+      --accent-secondary: #22c55e;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.5rem;
+      background: rgba(15,23,42,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid #111827;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-title {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      font-size: 1rem;
+      color: #f9fafb;
+    }
+
+    .nav-pill {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(56,189,248,0.5);
+      color: var(--accent-strong);
+    }
+
+    .nav-right a {
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: var(--text-main);
+      background: rgba(15,23,42,0.8);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+
+    .nav-right a span {
+      font-size: 1rem;
+    }
+
+    .nav-right a:hover {
+      border-color: var(--accent);
+      background: rgba(15,23,42,0.95);
+      transform: translateY(-1px);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.5fr);
+      gap: 2.25rem;
+      align-items: center;
+    }
+
+    @media (max-width: 840px) {
+      .shell {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .main {
+        padding-top: 2rem;
+      }
+    }
+
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(1.9rem, 4vw, 2.3rem);
+      line-height: 1.2;
+      margin: 0 0 0.6rem;
+      color: #f9fafb;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 32rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-bullets {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-bullet {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+    }
+
+    .hero-bullet-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #bbf7d0;
+      margin-top: 0.05rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .btn-primary {
+      padding: 0.75rem 1.4rem;
+      border-radius: 999px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      color: #020617;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.9);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 48px rgba(15,23,42,1);
+      opacity: 0.95;
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(15,23,42,0.8);
+    }
+
+    .btn-primary-icon {
+      font-size: 1.1rem;
+    }
+
+    .hero-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .hero-note-pill {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.6);
+      box-shadow: 0 0 8px rgba(34,197,94,0.9);
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 55%);
+      border-radius: 18px;
+      padding: 1.4rem 1.4rem 1.6rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 22px 50px rgba(0,0,0,0.75);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 550;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--text-muted);
+      background: rgba(15,23,42,0.92);
+    }
+
+    .form-wrapper {
+      margin-top: 0.5rem;
+      border-radius: 14px;
+      border: 1px dashed rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.75);
+      padding: 0.9rem 0.9rem 1rem;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .form-wrapper.visible {
+      max-height: 460px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    form {
+      margin: 0;
+    }
+
+    .field {
+      margin-bottom: 0.75rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+
+    .field label span.required {
+      color: var(--accent);
+      margin-left: 0.15rem;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      font-size: 0.86rem;
+      padding: 0.55rem 0.8rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .field textarea {
+      border-radius: 0.9rem;
+      min-height: 72px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.7);
+      background: #020617;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .form-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+    }
+
+    .btn-submit {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 550;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn-submit:hover {
+      background: rgba(56,189,248,0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15,23,42,0.9);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-submit[disabled] {
+      opacity: 0.6;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .submit-meta {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    .message {
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.8rem;
+      margin-top: 0.6rem;
+    }
+
+    .message-success {
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.6);
+      color: #bbf7d0;
+    }
+
+    .message-error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(248,113,113,0.8);
+      color: #fecaca;
+    }
+
+    .message ul {
+      margin: 0.25rem 0 0;
+      padding-left: 1.1rem;
+    }
+
+    .message li {
+      margin: 0.12rem 0;
+    }
+
+    footer {
+      padding: 0.9rem 1.5rem 1.2rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px solid #020617;
+      background: radial-gradient(circle at bottom, #020617, #020617 60%);
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-title">Secure Feedback Portal</div>
+      <div class="nav-pill">Private by design</div>
+    </div>
+    <div class="nav-right">
+      <a href="/admin/login">
+        <span>🔐</span>
+        <span>Admin Login</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="shell">
+      <section class="hero">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-dot"></span>
+          Trusted internal feedback
+        </div>
+        <h1 class="hero-title">
+          Share your thoughts with <span>full privacy</span>.
+        </h1>
+        <p class="hero-subtitle">
+          Use this secure channel to send feedback. Your responses are encrypted in transit and
+          stored safely on the server. Only authorized admins can view submissions.
+        </p>
+
+        <div class="hero-bullets">
+          <div class="hero-bullet">
+            <div class="hero-bullet-icon">✓</div>
+            <div>Admins are the only ones who can access stored feedback.</div>
+          </div>
+          <div class="hero-bullet">
+            <div class="hero-bullet-icon">✓</div>
+            <div>No sign-up required — submit feedback in a few seconds.</div>
+          </div>
+          <div class="hero-bullet">
+            <div class="hero-bullet-icon">✓</div>
+            <div>Responses are timestamped for easy review and reporting.</div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button id="open-feedback-btn" class="btn-primary" type="button">
+            <span class="btn-primary-icon">💬</span>
+            <span>Give Feedback</span>
+          </button>
+          <div class="hero-note">
+            <span class="hero-note-pill"></span>
+            Only admins can see what you submit.
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Quick feedback form</div>
+            <div class="card-subtitle">It takes less than a minute to complete.</div>
+          </div>
+          <div class="card-badge">Secure channel</div>
+        </div>
+
+        <div id="form-wrapper" class="form-wrapper">
+          <!-- Form will be generated here -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    Feedback is submitted over HTTP(S) to the server and stored securely. No feedback data is ever
+    shown on this public page.
+  </footer>
+
+  <script>
+    // Dynamic form configuration
+    const feedbackFields = [
+      { name: "name", label: "Name", type: "text", required: true },
+      { name: "email", label: "Email", type: "email", required: true },
+      { name: "rating", label: "Rating (1-5)", type: "number", required: true, min: 1, max: 5 },
+      { name: "comments", label: "Comments", type: "textarea", required: false }
+    ];
+
+    const formWrapper = document.getElementById("form-wrapper");
+    const openButton = document.getElementById("open-feedback-btn");
+
+    function buildFeedbackForm() {
+      const form = document.createElement("form");
+      form.id = "feedback-form";
+      form.setAttribute("novalidate", "novalidate");
+
+      feedbackFields.forEach(field => {
+        const fieldDiv = document.createElement("div");
+        fieldDiv.className = "field";
+
+        const label = document.createElement("label");
+        label.setAttribute("for", field.name);
+        label.textContent = field.label;
+
+        if (field.required) {
+          const star = document.createElement("span");
+          star.className = "required";
+          star.textContent = "*";
+          label.appendChild(star);
+        }
+
+        let input;
+        if (field.type === "textarea") {
+          input = document.createElement("textarea");
+        } else {
+          input = document.createElement("input");
+          input.type = field.type || "text";
+        }
+
+        input.id = field.name;
+        input.name = field.name;
+        if (field.required) {
+          input.required = true;
+        }
+        if (typeof field.min !== "undefined") {
+          input.min = field.min;
+        }
+        if (typeof field.max !== "undefined") {
+          input.max = field.max;
+        }
+
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+
+        // Optional small hint for rating/email
+        if (field.name === "rating") {
+          const hint = document.createElement("div");
+          hint.className = "hint";
+          hint.textContent = "Use a value between 1 (lowest) and 5 (highest).";
+          fieldDiv.appendChild(hint);
+        }
+
+        if (field.name === "email") {
+          const hint = document.createElement("div");
+          hint.className = "hint";
+          hint.textContent = "We'll only use this if the admin needs to follow up.";
+          fieldDiv.appendChild(hint);
+        }
+
+        form.appendChild(fieldDiv);
+      });
+
+      const footer = document.createElement("div");
+      footer.className = "form-footer";
+
+      const submitButton = document.createElement("button");
+      submitButton.className = "btn-submit";
+      submitButton.type = "submit";
+      submitButton.innerHTML = '<span>Submit feedback</span>';
+
+      const meta = document.createElement("div");
+      meta.className = "submit-meta";
+      meta.textContent = "Your answers are stored securely and visible only to admins.";
+
+      footer.appendChild(submitButton);
+      footer.appendChild(meta);
+
+      form.appendChild(footer);
+
+      const messageDiv = document.createElement("div");
+      messageDiv.id = "form-message";
+      form.appendChild(messageDiv);
+
+      form.addEventListener("submit", handleFormSubmit);
+
+      formWrapper.appendChild(form);
+    }
+
+    function setMessage(type, content) {
+      const messageDiv = document.getElementById("form-message");
+      messageDiv.innerHTML = "";
+      if (!content) {
+        messageDiv.className = "";
+        return;
+      }
+
+      messageDiv.className = "message " + (type === "success" ? "message-success" : "message-error");
+
+      if (Array.isArray(content)) {
+        const title = document.createElement("div");
+        title.textContent = type === "success" ? "Success" : "Please fix the following:";
+        messageDiv.appendChild(title);
+        const ul = document.createElement("ul");
+        content.forEach(err => {
+          const li = document.createElement("li");
+          li.textContent = err;
+          ul.appendChild(li);
+        });
+        messageDiv.appendChild(ul);
+      } else {
+        messageDiv.textContent = content;
+      }
+    }
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const submitBtn = form.querySelector(".btn-submit");
+      setMessage(null, null);
+
+      const formData = {};
+      let localErrors = [];
+
+      feedbackFields.forEach(field => {
+        const value = form[field.name].value.trim();
+
+        if (field.required && !value) {
+          localErrors.push(`${field.label} is required.`);
+        }
+
+        if (field.name === "rating" && value) {
+          const num = Number(value);
+          if (Number.isNaN(num) || num < 1 || num > 5) {
+            localErrors.push("Rating must be a number between 1 and 5.");
+          }
+        }
+
+        formData[field.name] = value;
+      });
+
+      if (localErrors.length) {
+        setMessage("error", localErrors);
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const response = await fetch("/api/feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          const errors = data && data.errors ? data.errors : ["Something went wrong. Please try again."];
+          setMessage("error", errors);
+        } else {
+          setMessage("success", data.message || "Thank you for your feedback!");
+          form.reset();
+        }
+      } catch (err) {
+        setMessage("error", ["Network error while submitting feedback. Please try again."]);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit feedback";
+      }
+    }
+
+    openButton.addEventListener("click", () => {
+      formWrapper.classList.toggle("visible");
+    });
+
+    // Build the form once, but keep it hidden until the user clicks
+    buildFeedbackForm();
+  </script>
+</body>
+</html>
